@@ -19,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6A0D89C92A96275C004F5CE2 /* Objc与KVO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = "Objc与KVO.md"; path = "../../Objc与KVO.md"; sourceTree = "<group>"; };
 		6A2491F12A8F442000E896E3 /* KVO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KVO.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A2491F42A8F442000E896E3 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6A2491F52A8F442000E896E3 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -67,6 +68,7 @@
 		6A2491F32A8F442000E896E3 /* KVO */ = {
 			isa = PBXGroup;
 			children = (
+				6A0D89C92A96275C004F5CE2 /* Objc与KVO.md */,
 				6A2491F42A8F442000E896E3 /* AppDelegate.h */,
 				6A2491F52A8F442000E896E3 /* AppDelegate.m */,
 				6A2491F72A8F442000E896E3 /* SceneDelegate.h */,

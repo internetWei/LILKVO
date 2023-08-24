@@ -10,15 +10,27 @@
 
 @class Person;
 
+struct Custom {
+    int par1;
+    double par2;
+    long par3;
+    float par4;
+    short par5;
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LILObject : NSObject
 
-@property (nonatomic, assign) NSRange range;
+@property (nonatomic, assign) UIOffset offset;
+
+@property (nonatomic, assign) struct Custom custom;
 
 @property (nonatomic, strong) Person *person;
 
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, assign) int age;
+
+@property (nonatomic, assign) double weight;
 
 @end
 

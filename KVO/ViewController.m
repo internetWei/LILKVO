@@ -46,7 +46,7 @@ void PrintMethod(Class aClass) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = UIColor.redColor;
+    self.view.backgroundColor = UIColor.whiteColor;
     
     LILObject *obj = [LILObject new];
     self.obj = obj;
@@ -81,6 +81,15 @@ void PrintMethod(Class aClass) {
     [obj lil_addObserverBlockForPath:LILKEYPATH(obj, weight) block:^(id  _Nonnull obj, id  _Nullable oldVal, id  _Nullable newVal) {
         NSLog(@"oldVal: %@, newVal: %@", oldVal, newVal);
     }];
+    
+    UILabel *label = [[UILabel alloc] init];
+    label.textColor = UIColor.blackColor;
+    label.text = @"轻点屏幕然后观察控制台打印";
+    [self.view addSubview:label];
+    [label sizeToFit];
+    label.center = self.view.center;
+    
+    NSLog(@"-----------------");
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {

@@ -12,7 +12,7 @@
 #import <objc/runtime.h>
 
 /// 返回一个随机浮点数，包含起始值和终点值
-UIKIT_STATIC_INLINE CGFloat mRandomFloat(CGFloat from, CGFloat to) {
+CGFloat mRandomFloat(CGFloat from, CGFloat to) {
     NSInteger precision = 100;
     CGFloat subtraction = to - from;
     subtraction = ABS(subtraction);

@@ -13,7 +13,7 @@
 static void _property_getAttributeList(id, NSString *, NSString * _Nullable *, NSString * _Nullable *);
 // 获取 _CF_forwarding_prep_0 函数指针。
 static IMP _getForwardingIMP(void);
-// 这里必须使用强制内联，因为当函数返回时内部的变量 type 会被释放，这会导致变量 t_type 是一个垃圾值。
+// 这里必须使用强制内联，因为当函数返回时内部的变量会被释放，这会导致返回值是一个垃圾值。
 static __attribute__((always_inline)) char * _getArgumentType(Method);
 
 static void LILSetArbitraryValueAndNotify(id, SEL, ...);
@@ -169,7 +169,6 @@ void LILKVOForwardInvocation(id self, SEL _cmd, NSInvocation *anInvocation) {
     Class superClass = class_getSuperclass(object_getClass(self));
     Method method = class_getInstanceMethod(superClass, anInvocation.selector);
     char *type = _getArgumentType(method);
-    id newVal = nil;
     BOOL unsupportedType = NO;
     
     switch (*type) {
@@ -178,31 +177,24 @@ void LILKVOForwardInvocation(id self, SEL _cmd, NSInvocation *anInvocation) {
             if (strcmp(type, @encode(NSRange)) == 0) {
                 NSRange value;
                 [anInvocation getArgument:&value atIndex:0x2];
-                newVal = [NSValue valueWithRange:value];
             } else if (strcmp(type, @encode(CGPoint)) == 0) {
                 CGPoint value;
                 [anInvocation getArgument:&value atIndex:0x2];
-                newVal = [NSValue valueWithBytes:&value objCType:type];
             } else if (strcmp(type, @encode(CGSize)) == 0) {
                 CGSize value;
                 [anInvocation getArgument:&value atIndex:0x2];
-                newVal = [NSValue valueWithBytes:&value objCType:type];
             } else if (strcmp(type, @encode(CGRect)) == 0) {
                 CGRect value;
                 [anInvocation getArgument:&value atIndex:0x2];
-                newVal = [NSValue valueWithBytes:&value objCType:type];
             } else if (strcmp(type, @encode(CGVector)) == 0) {
                 CGVector value;
                 [anInvocation getArgument:&value atIndex:0x2];
-                newVal = [NSValue valueWithBytes:&value objCType:type];
             } else if (strcmp(type, @encode(CGAffineTransform)) == 0) {
                 CGAffineTransform value;
                 [anInvocation getArgument:&value atIndex:0x2];
-                newVal = [NSValue valueWithBytes:&value objCType:type];
             } else if (strcmp(type, @encode(CGAffineTransformComponents)) == 0) {
                 CGAffineTransformComponents value;
                 [anInvocation getArgument:&value atIndex:0x2];
-                newVal = [NSValue valueWithBytes:&value objCType:type];
             } else {
                 unsupportedType = YES;
             }
@@ -219,7 +211,6 @@ else if (size <= 4 * _size_ ) { \
     struct dummy { char tmp[4 * _size_]; }; \
     struct dummy value;\
     [anInvocation getArgument:&value atIndex:0x2];\
-    newVal = [NSValue valueWithBytes:&value objCType:type];\
 }
             if (size == 0) { }
             case_size( 1) case_size( 2) case_size( 3) case_size( 4)
@@ -251,6 +242,12 @@ else if (size <= 4 * _size_ ) { \
     if (![observerPropertys containsObject:methodString]) { return; }
     
     NSArray *blocks = info[methodString];
+    id newVal = nil;
+    if (blocks.count > 0) {
+        /* 这里之所以要重新获取，而不是使用 newVal = [NSValue valueWithBytes:&value objCType:type]; 获取，
+        是因为开发者可能在 setter 方法进行设置，这会导致传进去的值未必是最终的属性值。*/
+        newVal = [self valueForKey:ivarName];
+    }
     for (void (^block)(id, id, id) in blocks) {
         block(self, oldVal, newVal);
     }
@@ -268,7 +265,6 @@ void LILSetArbitraryValueAndNotify(id self, SEL _cmd, ...) {
     
     Method method = class_getInstanceMethod(superClass, _cmd);
     char *type = _getArgumentType(method);
-    id newVal = nil;
     
     va_list args;
     va_start(args, _cmd);
@@ -287,7 +283,6 @@ void LILSetArbitraryValueAndNotify(id self, SEL _cmd, ...) {
         {
             int arg = va_arg(args, int);
             superMethod(superObjc, _cmd, arg);
-            newVal = @(arg);
         } break;
         
         case 'q': // long long
@@ -295,7 +290,6 @@ void LILSetArbitraryValueAndNotify(id self, SEL _cmd, ...) {
         {
             long long arg = va_arg(args, long long);
             superMethod(superObjc, _cmd, arg);
-            newVal = @(arg);
         } break;
         
         case 'f': // float
@@ -303,21 +297,18 @@ void LILSetArbitraryValueAndNotify(id self, SEL _cmd, ...) {
             double arg = va_arg(args, double);
             float argf = arg;
             superMethod(superObjc, _cmd, argf);
-            newVal = @(argf);
         } break;
         
         case 'd': // double
         {
             double arg = va_arg(args, double);
             superMethod(superObjc, _cmd, arg);
-            newVal = @(arg);
         } break;
         
         case 'D': // long double
         {
             long double arg = va_arg(args, long double);
             superMethod(superObjc, _cmd, arg);
-            newVal = [NSNumber numberWithDouble:arg];
         } break;
         
         case '*': // char *
@@ -325,28 +316,24 @@ void LILSetArbitraryValueAndNotify(id self, SEL _cmd, ...) {
         {
             void *arg = va_arg(args, void *);
             superMethod(superObjc, _cmd, arg);
-            newVal = [NSValue valueWithPointer:arg];
         } break;
         
         case ':': // SEL
         {
             SEL arg = va_arg(args, SEL);
             superMethod(superObjc, _cmd, arg);
-            newVal = NSStringFromSelector(arg);
         } break;
         
         case '#': // Class
         {
             Class arg = va_arg(args, Class);
             superMethod(superObjc, _cmd, arg);
-            newVal = arg;
         } break;
         
         case '@': // id
         {
             id arg = va_arg(args, id);
             superMethod(superObjc, _cmd, arg);
-            newVal = arg;
         } break;
         
         default: NSAssert(NO, @"参数(%s)是未知类型", type);
@@ -358,6 +345,12 @@ void LILSetArbitraryValueAndNotify(id self, SEL _cmd, ...) {
     if (![observerPropertys containsObject:NSStringFromSelector(_cmd)]) { return; }
     
     NSArray *blocks = info[NSStringFromSelector(_cmd)];
+    id newVal = nil;
+    if (blocks.count > 0) {
+        /* 这里之所以要重新获取，而不是使用 newVal = [NSValue valueWithBytes:&value objCType:type]; 获取，
+        是因为开发者可能在 setter 方法进行设置，这会导致传进去的值未必是最终的属性值。*/
+        newVal = [self valueForKey:ivarName];
+    }
     for (void (^block)(id, id, id) in blocks) {
         block(self, oldVal, newVal);
     }

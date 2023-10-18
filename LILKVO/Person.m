@@ -9,11 +9,6 @@
 
 @implementation Person
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
-    NSLog(@"keyPath: %@, object: %@, change: %@", keyPath, object, change);
-    NSLog(@"origin: %@", _name);
-}
-
 @end
 
 

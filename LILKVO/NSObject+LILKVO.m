@@ -195,8 +195,9 @@ struct LILTestKVO {
         }
         
         if (strcmp(name, "S") == 0) {
+            NSString *methodName = [NSString stringWithUTF8String:attributes[i].value];
             free(attributes);
-            return [NSString stringWithUTF8String:attributes[i].value];
+            return methodName;
         }
     }
     

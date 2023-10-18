@@ -18,6 +18,10 @@ typedef struct {
     short par6;
 } CustomStruct;
 
+typedef struct {
+    CGFloat price, score;
+} Book;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Person : NSObject
@@ -31,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) Animal *pet;
 
 @property (nonatomic, assign) CustomStruct customStruct;
+
+@property (nonatomic, assign) Book book;
 
 @end
 

@@ -20,6 +20,7 @@ int main(int argc, const char * argv[]) {
     dog.name = @"dog";
     p.pet = dog;
     p.customStruct = (CustomStruct){1, 87.762, 3, 89, 14, 89};
+    p.book = (Book){1, 2};
     
     [p lil_addObserverForPropertyName:LILKEYPATH(p, age) block:^(id  _Nonnull obj, id  _Nullable oldVal, id  _Nullable newVal) {
         NSLog(@"oldAge: %ld, newAge: %ld", [oldVal integerValue], [newVal integerValue]);
@@ -46,6 +47,15 @@ int main(int argc, const char * argv[]) {
         NSLog(@"(oldStruct: %d, %f, %f, %ld, %c, %hd), (newStruct: %d, %f, %f, %ld, %c, %hd)", oldValue.par1, oldValue.par2, oldValue.par3, oldValue.par4, oldValue.par5, oldValue.par6, newValue.par1, newValue.par2, newValue.par3, newValue.par4, newValue.par5, newValue.par6);
     }];
     
+    [p lil_addObserverForPropertyName:LILKEYPATH(p, book) block:^(id  _Nonnull obj, id  _Nullable oldVal, id  _Nullable newVal) {
+        Book oldValue;
+        Book newValue;
+        [oldVal getValue:&oldValue];
+        [newVal getValue:&newValue];
+        
+        NSLog(@"(oldBook: %f, %f), (newBook: %f, %f)", oldValue.price, oldValue.score, newValue.price, newValue.score);
+    }];
+    
     p.age = 21;
     p.weight = 149.14159;
     p.name = @"小红";
@@ -53,6 +63,7 @@ int main(int argc, const char * argv[]) {
     cat.name = @"cat";
     p.pet = cat;
     p.customStruct = (CustomStruct){9, 99.89, 12, 99, 21, 98};
+    p.book = (Book){3, 4};
     
     return 0;
 }

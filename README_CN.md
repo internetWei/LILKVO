@@ -1,0 +1,1 @@
+这是我在学习 KVO 的过程中，模仿它写的一个框架。仅用于技术研究，不建议在项目中直接使用，如果你有任何疑问，欢迎提交[issue](https://gitee.com/internetWei/lilkvo/issues)，也可以联系我的邮箱：internetwei@foxmail.com

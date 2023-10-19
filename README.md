@@ -1,1 +1,1 @@
-这是我在学习 KVO 的过程中自己模仿系统 KVO 写的一个框架。它仅用于技术研究，你可以通过阅读它了解一些关于 KVO 方面的知识，不建议在项目中直接使用。注意，它和系统KVO的实现原理不完全一样。
+这是我在学习 KVO 的过程中，模仿它写的一个框架。仅用于技术研究，不建议在项目中直接使用，如果你有任何疑问，欢迎提交[issue](https://github.com/internetWei/LILKVO/issues)，也可以联系我的邮箱：internetwei@foxmail.com

@@ -16,18 +16,6 @@ static void LILSetArbitraryValueAndNotify(id, SEL, ...);
 static void LILKVOForwardInvocation(id, SEL, NSInvocation *);
 static Class LILKVOClass(id, SEL);
 
-struct LILTestKVO {
-    CGFloat value1, value2;
-};
-
-@interface LILKVOFoarwading : NSObject
-// 这里必须使用自定义结构体，只有这样才能获取 `_CF_forwarding_prep_0` 函数指针。
-@property (nonatomic, assign) struct LILTestKVO value;
-@end
-
-@implementation LILKVOFoarwading
-@end
-
 
 @implementation NSObject (LILKVO)
 
@@ -113,7 +101,7 @@ struct LILTestKVO {
         type == '^' || type == ':') {
         class_addMethod(kvoClass, setterSelector, (IMP)LILSetArbitraryValueAndNotify, method_getTypeEncoding(setterMethod));
     } else {
-        class_addMethod(kvoClass, setterSelector, [self _getForwardingIMP], method_getTypeEncoding(setterMethod));
+        class_addMethod(kvoClass, setterSelector, _objc_msgForward, method_getTypeEncoding(setterMethod));
         class_addMethod(kvoClass, @selector(forwardInvocation:), (IMP)LILKVOForwardInvocation, method_getTypeEncoding(class_getInstanceMethod(kvoClass, @selector(forwardInvocation:))));
     }
     
@@ -205,24 +193,6 @@ struct LILTestKVO {
     
     NSString *first = [propertyName substringToIndex:1];
     return [NSString stringWithFormat:@"set%@%@:", [first uppercaseString], [propertyName substringFromIndex:1]];
-}
-
-- (nullable IMP)_getForwardingIMP {
-    static IMP imp;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        /*
-         开发者无法直接获得 _CF_forwarding_prep_0，
-         这里通过 KVO 的中间类间接获取 _CF_forwarding_prep_0。
-         */
-        LILKVOFoarwading *obj = [[LILKVOFoarwading alloc] init];
-        [obj addObserver:obj forKeyPath:@"value" options:NSKeyValueObservingOptionNew context:nil];
-        Class aClass = object_getClass(obj);
-        Method method = class_getInstanceMethod(aClass, @selector(setValue:));
-        imp = method_getImplementation(method);
-        [obj removeObserver:obj forKeyPath:@"value"];
-    });
-    return imp;
 }
 
 @end
